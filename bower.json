@@ -1,8 +1,9 @@
 {
   "name": "paper-tags-input",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "authors": [
     "Tianxiang Zhang <cenhiangapply@gmail.com>"
+    "Pawel Psztyc <jarrodek@gmail.com>"
   ],
   "description": "An input element for tags.",
   "keywords": [
