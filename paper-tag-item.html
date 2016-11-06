@@ -1,11 +1,13 @@
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
-
 <!--
 
-tag-item is a tag element used by tags-input to show tags with a closed button.
+`paper-tag-item` is an element to be used with `paper-tags-input` to show tags.
 
-    <tag-item></tag-item>
+## Example
+```
+<tag-item></tag-item>
+```
 
 ### Styling
 
@@ -16,117 +18,109 @@ Custom property | Description | Default
 `--tag-background-color` | Background color of the tag | `--default-primary-color`
 `--tag-text-color` | Color for the icon and text | `--text-primary-color`
 
-### Dependencies
-<link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../paper-ripple/paper-ripple.html">
-
 @demo
 -->
 <dom-module id="paper-tag-item">
-    <style>
-    :host {
-        display: block;
-        background-color: var(--tag-background-color, --default-primary-color);
-        color: var(--tag-text-color, --text-primary-color);
-        border-radius: 20px;
-        margin-right: 12px;
-        margin-bottom: 12px;
-        --iron-icon-height: 24px;
-        --iron-icon-width: 24px;
-    }
-    
-    #container {
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
-        position: relative;
-    }
-    
-    .large .tag-value {
-        font-size: 18px;
-        padding: 8px 16px;
-    }
-    
-    .large iron-icon {
-        margin-right: 16px;
-        --iron-icon-height: 24px;
-        --iron-icon-width: 24px;
-    }
-    
-    .medium .tag-value {
-        font-size: 16px;
-        padding: 6px 12px;
-    }
-    
-    .medium iron-icon {
-        margin-right: 12px;
-        --iron-icon-height: 18px;
-        --iron-icon-width: 18px;
-    }
-    
-    .small .tag-value {
-        font-size: 14px;
-        padding: 4px 8px;
-    }
-    
-    .small iron-icon {
-        margin-right: 8px;
-        --iron-icon-height: 12px;
-        --iron-icon-width: 12px;
-    }
-    </style>
-    <template>
-        <div id="container" class$="{{size}}">
-            <paper-ripple></paper-ripple>
-            <span class="tag-value">{{value}}</span>
-            <template is="dom-if" if="{{enableRemove}}">
-                <iron-icon icon="icons:cancel"></iron-icon>
-            </template>
-        </div>
-    </template>
+  <style>
+   :host {
+    display: block;
+    background-color: var(--tag-background-color, --default-primary-color);
+    color: var(--tag-text-color, --text-primary-color);
+    border-radius: 20px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    --iron-icon-height: 24px;
+    --iron-icon-width: 24px;
+  }
+
+  #container {
+    @apply(--layout-horizontal);
+    @apply(--layout-center);
+    position: relative;
+    cursor: pointer;
+  }
+
+  :host([disable-remove]) #container {
+    cursor: text;
+  }
+
+  .large .tag-value {
+    font-size: 18px;
+    padding: 8px 16px;
+  }
+
+  .large iron-icon {
+    margin-right: 16px;
+    --iron-icon-height: 24px;
+    --iron-icon-width: 24px;
+  }
+
+  .medium .tag-value {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+
+  .medium iron-icon {
+    margin-right: 12px;
+    --iron-icon-height: 18px;
+    --iron-icon-width: 18px;
+  }
+
+  .small .tag-value {
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+
+  .small iron-icon {
+    margin-right: 8px;
+    --iron-icon-height: 12px;
+    --iron-icon-width: 12px;
+  }
+  </style>
+  <template>
+    <div id="container" class$="[[size]]">
+      <paper-ripple hidden="[[disableRemove]]"></paper-ripple>
+      <span class="tag-value">{{value}}</span>
+      <iron-icon hidden="[[disableRemove]]" icon="cancel"  title="Remove tag"></iron-icon>
+    </div>
+  </template>
 </dom-module>
 <script>
 Polymer({
-    is: 'paper-tag-item',
+  is: 'paper-tag-item',
 
-    listeners: {
-        'transitionend': '_rippleAnimationEnd'
+  listeners: {
+    'transitionend': '_rippleAnimationEnd'
+  },
+
+  properties: {
+    // Size of the tags, possible values: small, medium, large
+    size: {
+      type: String,
+      value: 'medium',
+      observer: '_sizeChanged'
     },
 
-    properties: {
-        /**
-         * size of the tags, possible values: small, medium, large
-         */
-        size: {
-            type: String,
-            value: 'large',
-            observer: '_sizeChanged'
-        },
-        /**
-         * Boolean flag to indicate if enable remove operation
-         */
-        enableRemove: {
-            type: Boolean,
-            value: true
-        },
-        /**
-         * value of the tag
-         */
-        value: String
+    // Set to true when remove option should be disabled
+    disableRemove: {
+      type: Boolean,
+      reflectToAttribute: true
     },
-    /**
-     * Update styles for mixins.
-     */
-    _sizeChanged: function() {
-        this.updateStyles();
-    },
-    /**
-     * _removeItem is the internal method to remove a tag from the tags list
-     *
-     * @param {object} event object
-     */
-    _rippleAnimationEnd: function(e) {
-        this.fire('remove-tag');
-    }
+    // Value of the tag
+    value: String
+  },
+  /**
+   * Update styles for mixins.
+   */
+  _sizeChanged: function() {
+    this.updateStyles();
+  },
+  /**
+   * _removeItem is the internal method to remove a tag from the tags list
+   */
+  _rippleAnimationEnd: function() {
+    this.fire('remove-tag');
+  }
 
 });
 </script>

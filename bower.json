@@ -1,8 +1,8 @@
 {
   "name": "paper-tags-input",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "authors": [
-    "Tianxiang Zhang <cenhiangapply@gmail.com>"
+    "Tianxiang Zhang <cenhiangapply@gmail.com>",
     "Pawel Psztyc <jarrodek@gmail.com>"
   ],
   "description": "An input element for tags.",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "web-component-tester": "*"
+    "web-component-tester": "*",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.2.5"
   }
 }

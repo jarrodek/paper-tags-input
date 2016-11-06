@@ -1,169 +1,117 @@
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="paper-tag-item.html">
-
 <!--
-paper-tags-input is a list of tags with a single-line text field with Material Design styling.
+`paper-tags-input` is a list of tags with a single-line text field with Material Design styling.
 
-    <paper-tags-input></paper-tags-input>
+    <paper-tags-input label="Add tags"></paper-tags-input>
 
-Use a label property to show the label for tags input and placeholder property for the placeholder in paper-input element.
+Note: Only unique tags will be included in the result list.
 
-    <paper-tags-input label="Tags" placeholder="Please enter the tag"></paper-tags-input>
 
-Tags list are stored in the property of tags.
-
-    <paper-tags-input tags="{{tags_list}}"></paper-tags-input>
-
-Tags array will be unique. It means that if user enter a duplicate name it will not be appended to the array.
-
-<b>Internaltional</b>
-
-paper-tags-input work with all unicode languages, such as Chinese, Korean, Japanese, German, Russian, Arabic, etc.
-
-<b>Installation</b>
-
-Install with bower
-
-    bower install paper-tags-input
-
-If you want to save it in bower.json file, remember to add flag --save
-
-    bower install --save paper-tags-input
+## Observing tags list changes
+If you are using Polymer then just set a variable for the `tags` attribute
+```
+<paper-tags-input tags="{{userTags}}"></paper-tags-input>
+```
+Otherwise you'd like to listen for `tags-changed` event:
+```
+<paper-tags-input></paper-tags-input>
+...
+document.querySelector('paper-tags-input').addEventListener('tags-changed', function(e) { ... });
+```
 
 ### Styling
-
 The following custom properties are available for styling:
 
 Custom property | Description | Default
 ----------------|-------------|----------
 `--tag-background-color` | Background color of the tag | `--default-primary-color`
-`--tag-text-color` | Color for the icon and text | `--text-primary-color`
-
-
-### Dependencies
-<link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-styles/paper-styles.html">
-<link rel="import" href="paper-tag-item.html">
+`--tag-text-color` | Color for the icon and the text | `--text-primary-color`
 
 @demo
 -->
 <dom-module id="paper-tags-input">
-    <style>
-    :host {
-        display: block;
-    }
-    
-    #tags-items {
-        @apply(--layout-horizontal);
-        @apply(--layout-wrap);
-    }
-    </style>
-    <template>
-        <template is="dom-if" if="{{enableAdd}}">
-            <paper-input id="tag-input" on-focusout="_processTagInput" label="{{label}}" placeholder="{{placeholder}}" on-keydown="_keyDown" value="{{input_value}}"></paper-input>
-        </template>
-        <div id="tags-items">
-            <template is="dom-repeat" items="{{tags}}" id="tagList">
-                <paper-tag-item font-color="{{fontColor}}" tag-color="{{tagColor}}" size="{{size}}" enable-remove="{{enableRemove}}" value="{{item}}" on-remove-tag="_removeTag"></paper-tag-item>
-            </template>
-        </div>
-    </template>
+  <style>
+   :host {
+    display: block;
+  }
+
+  #tags-items {
+    @apply(--layout-horizontal);
+    @apply(--layout-wrap);
+  }
+  </style>
+  <template>
+    <paper-input id="tag-input" on-focusout="_processTagInput" label="{{label}}" placeholder="{{placeholder}}" on-keydown="_keyDown" value="{{_inputValue}}"></paper-input>
+    <div id="tags-items">
+      <template is="dom-repeat" items="[[tags]]" id="tagList">
+        <paper-tag-item size="[[size]]" disable-remove="[[disableRemove]]" value="[[item]]" on-remove-tag="_removeTag"></paper-tag-item>
+      </template>
+    </div>
+  </template>
 </dom-module>
 <script>
 Polymer({
 
-    is: 'paper-tags-input',
+  is: 'paper-tags-input',
 
-    properties: {
+  properties: {
 
-        /**
-         * list of String that holds tags. Values in this array should be identical and avoids duplicates due to the definition of tags.
-         */
-        tags: {
-            type: Array,
-            notify: true,
-            value: function() {
-                return [];
-            }
-        },
-        /**
-         * size of the tags, possible values: small, medium, large
-         */
-        size: {
-            type: String,
-            value: 'large'
-        },
-        /**
-         * Boolean flag for whether add tag operation is enabled.
-         */
-        enableAdd: {
-            type: Boolean,
-            value: true
-        },
-        /**
-         * Boolean flag for whether remove tag operation is enabled.
-         */
-        enableRemove: {
-            type: Boolean,
-            value: true
-        },
-        /**
-         * The label that will show up as the label for tags input.
-         */
-        label: String,
-        /**
-         * The placeholder for the paper-input element.
-         */
-        placeholder: {
-            type: String,
-            value: 'Please enter a new tag'
-        },
-        /**
-         * Internal variable to hold the value of paper-input.
-         */
-        _input_value: String,
-    },
     /**
-     * _keyDown is fired when user enters a key in the input
-     *
-     * @param {object} event object
+     * list of String that holds tags. Values in this array should be identical and avoids duplicates due to the definition of tags.
      */
-    _keyDown: function(e) {
-        if (this.enableAdd === false) {
-            return;
-        }
-
-        var keyVal = e.which;
-        if (keyVal == 13) {
-            e.preventDefault(); //don't submit form
-            this._processTagInput();
-        }
+    tags: {
+      type: Array,
+      notify: true,
+      value: function() {
+        return [];
+      }
     },
-
-    _processTagInput: function() {
-        if (this.enableAdd === false) {
-            return;
-        }
-
-        var tag = this.input_value.trim();
-        if (tag === "") {
-            //just do nothing
-        } else if (this.tags.indexOf(tag) >= 0) {
-            this.input_value = "";
-            // just pass it
-        } else {
-            this.push('tags', tag);
-            this.input_value = "";
-        }
-    },
-
-    _removeTag: function(e) {
-        var item = this.$.tagList.itemForElement(e.target);
-        var index = this.tags.indexOf(item);
-        if (index === -1) return;
-        this.splice('tags', index, 1);
+    // Size of the tags, possible values: small, medium, large
+    size: String,
+    // Set to true if tags removal should be disabled.
+    disableRemove: Boolean,
+    // Label binded to the paper-input's label property
+    label: String,
+    // Placeholder binded to the paper-input's placeholder property
+    placeholder: String,
+    // Internal variable to hold the value of paper-input.
+    _inputValue: String,
+  },
+  /**
+   * _keyDown is fired when user enters a key in the input
+   *
+   * @param {object} event object
+   */
+  _keyDown: function(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault(); //don't submit form
+      this._processTagInput();
     }
+  },
+
+  _processTagInput: function() {
+    var tag = this._inputValue.trim();
+    if (tag === '') {
+      //just do nothing
+    } else if (this.tags.indexOf(tag) >= 0) {
+      this._inputValue = '';
+      // just pass it
+    } else {
+      this.push('tags', tag);
+      this._inputValue = '';
+    }
+  },
+
+  _removeTag: function(e) {
+    var item = this.$.tagList.itemForElement(e.target);
+    var index = this.tags.indexOf(item);
+    if (index === -1) {
+      return;
+    }
+    this.splice('tags', index, 1);
+  }
 
 });
 </script>
